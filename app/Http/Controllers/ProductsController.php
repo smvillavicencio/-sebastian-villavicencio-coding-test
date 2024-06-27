@@ -93,14 +93,24 @@ class ProductsController extends Controller
     //     //
     // }
 
-    // /**
-    //  * Remove the specified resource from storage.
-    //  *
-    //  * @param  int  $id
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function destroy($id)
-    // {
-    //     //
-    // }
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        try {
+            $data = Product::where('id', '=', $id)->delete();
+            if ($data) {
+                return response("Product with product id " . $id . " was successfully deleted", 200);
+            } else {
+                return response("Product with product id " . $id . " not found.", 404);
+            }
+        } catch (\Exception $exception) {
+            echo $exception;
+            return response("Server error", 500);
+        }
+    }
 }

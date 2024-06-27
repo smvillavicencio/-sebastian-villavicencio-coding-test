@@ -62,7 +62,7 @@ class ProductsController extends Controller
     public function show($id)
     {
         try {
-            $data = Product::get()->where('id', $id);
+            $data = Product::where('id', $id)->get();
             return response($data, 200);
         } catch (\Exception $exception) {
             echo $exception;
@@ -70,28 +70,34 @@ class ProductsController extends Controller
         }
     }
 
-    // /**
-    //  * Show the form for editing the specified resource.
-    //  *
-    //  * @param  int  $id
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function edit($id)
-    // {
-    //     return;
-    // }
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'product_name' => ['required', 'max:255'],
+                'product_description' => 'required',
+                'product_price' => ['required', 'numeric', 'gte:0', 'decimal:0,2']
+            ]);
 
-    // /**
-    //  * Update the specified resource in storage.
-    //  *
-    //  * @param  \Illuminate\Http\Request  $request
-    //  * @param  int  $id
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function update(Request $request, $id)
-    // {
-    //     //
-    // }
+            $data = Product::where('id', $id)->update($validated);
+
+            if ($data) {
+                return response("Product with product id " . $id . " was successfully edited", 200);
+            } else {
+                return response("Product with product id " . $id . " not found.", 404);
+            }
+        } catch (\Exception $exception) {
+            echo $exception;
+            return response("Server error", 500);
+        }
+    }
 
     /**
      * Remove the specified resource from storage.

@@ -17,7 +17,7 @@ class ProductsController extends Controller
     {
 
         try {
-            $data = Product::get();
+            $data = Product::paginate(10);
             return response($data, 200);
         } catch (\Exception $exception) {
             echo $exception;

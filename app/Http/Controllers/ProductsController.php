@@ -20,7 +20,7 @@ class ProductsController extends Controller
             $data = Product::paginate(10);
             return response($data, 200);
         } catch (\Exception $exception) {
-            echo $exception;
+            echo $exception->getMessage();
             return response("Server error", 500);
         }
     }
@@ -48,7 +48,7 @@ class ProductsController extends Controller
 
             return response($product->product_name . " successfully added to the database.", 200);
         } catch (\Exception $exception) {
-            echo $exception;
+            echo $exception->getMessage();
             return response("Server error", 500);
         }
     }
@@ -65,7 +65,7 @@ class ProductsController extends Controller
             $data = Product::where('id', $id)->get();
             return response($data, 200);
         } catch (\Exception $exception) {
-            echo $exception;
+            echo $exception->getMessage();
             return response("Server error", 500);
         }
     }
@@ -94,7 +94,7 @@ class ProductsController extends Controller
                 return response("Product with product id " . $id . " not found.", 404);
             }
         } catch (\Exception $exception) {
-            echo $exception;
+            echo $exception->getMessage();
             return response("Server error", 500);
         }
     }
@@ -115,7 +115,7 @@ class ProductsController extends Controller
                 return response("Product with product id " . $id . " not found.", 404);
             }
         } catch (\Exception $exception) {
-            echo $exception;
+            echo $exception->getMessage();
             return response("Server error", 500);
         }
     }

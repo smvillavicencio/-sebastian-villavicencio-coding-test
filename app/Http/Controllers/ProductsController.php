@@ -26,25 +26,32 @@ class ProductsController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Store a newly created resource in storage.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    // public function create()
-    // {
-    //     //
-    // }
+    public function store(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'product_name' => ['required', 'max:255'],
+                'product_description' => 'required',
+                'product_price' => ['required', 'numeric', 'gte:0', 'decimal:0,2']
+            ]);
 
-    // /**
-    //  * Store a newly created resource in storage.
-    //  *
-    //  * @param  \Illuminate\Http\Request  $request
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function store(Request $request)
-    // {
-    //     //
-    // }
+            $product = new Product;
+            $product->product_name = $request->product_name;
+            $product->product_description = $request->product_description;
+            $product->product_price = $request->product_price;
+            $product->save();
+
+            return response($product->product_name . " successfully added to the database.", 200);
+        } catch (\Exception $exception) {
+            echo $exception;
+            return response("Server error", 500);
+        }
+    }
 
     /**
      * Display the specified resource.

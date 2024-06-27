@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Facades\Cache;
 
 class ProductsController extends Controller
 {
@@ -62,7 +63,10 @@ class ProductsController extends Controller
     public function show($id)
     {
         try {
-            $data = Product::where('id', $id)->get();
+            // Store a product in the cache for 10 minutes
+            $data = Cache::remember('product_' . $id, 60 * 10, function () use ($id) {
+                return Product::where('id', $id)->get();
+            });
             return response($data, 200);
         } catch (\Exception $exception) {
             echo $exception->getMessage();

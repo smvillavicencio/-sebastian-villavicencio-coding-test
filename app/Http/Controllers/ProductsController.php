@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Cache;
 
 class ProductsController extends Controller
 {
+    public function __construct(protected ProductService $productService)
+    {
+    }
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +22,7 @@ class ProductsController extends Controller
     {
 
         try {
-            $data = Product::paginate(10);
+            $data = $this->productService->all();
             return response($data, 200);
         } catch (\Exception $exception) {
             echo $exception->getMessage();
@@ -35,17 +39,13 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         try {
-            $this->validate($request, [
+            $data = $this->validate($request, [
                 'product_name' => ['required', 'max:255'],
                 'product_description' => 'required',
                 'product_price' => ['required', 'numeric', 'gte:0', 'decimal:0,2']
             ]);
 
-            $product = new Product;
-            $product->product_name = $request->product_name;
-            $product->product_description = $request->product_description;
-            $product->product_price = $request->product_price;
-            $product->save();
+            $product = $this->productService->add($data);
 
             return response($product->product_name . " successfully added to the database.", 200);
         } catch (\Exception $exception) {
@@ -63,10 +63,8 @@ class ProductsController extends Controller
     public function show($id)
     {
         try {
-            // Store a product in the cache for 10 minutes
-            $data = Cache::remember('product_' . $id, 60 * 10, function () use ($id) {
-                return Product::where('id', $id)->get();
-            });
+            $data = $this->productService->find($id);
+
             return response($data, 200);
         } catch (\Exception $exception) {
             echo $exception->getMessage();
@@ -90,7 +88,7 @@ class ProductsController extends Controller
                 'product_price' => ['required', 'numeric', 'gte:0', 'decimal:0,2']
             ]);
 
-            $data = Product::where('id', $id)->update($validated);
+            $data = $this->productService->update($validated, $id);
 
             if ($data) {
                 return response("Product with product id " . $id . " was successfully edited", 200);
@@ -112,7 +110,7 @@ class ProductsController extends Controller
     public function destroy($id)
     {
         try {
-            $data = Product::where('id', '=', $id)->delete();
+            $data = $this->productService->delete($id);
             if ($data) {
                 return response("Product with product id " . $id . " was successfully deleted", 200);
             } else {
